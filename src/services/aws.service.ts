@@ -6,14 +6,13 @@ import { EmailInterface } from "../interfaces/auth.interface";
 
 import logger from "../logger";
 
-// Set the region
 AWS.config.update({
   region: config.aws.region,
   accessKeyId: config.aws.accessKey,
   secretAccessKey: config.aws.secretKey,
 });
 
-const SES_SENDER_NAME = process.env.SES_SENDER_NAME || "USE DIVEST";
+const SES_SENDER_NAME = process.env.SES_SENDER_NAME || "RISEVEST";
 const SES_SOURCE_EMAIL = process.env.SES_SOURCE_EMAIL as string;
 const SES_REPLY_TO_EMAIL = process.env.SES_REPLY_TO_EMAIL as string;
 

@@ -37,6 +37,4 @@ export default {
     region: process.env.AWS_REGION as string,
     sqsUrl: process.env.SQS_QUEUE_URL as string,
   },
-  localServerUrl: process.env.LOCAL_SERVER_URL as string,
-  productionServerUrl: process.env.PRODUCTION_SERVER_URL as string
 };

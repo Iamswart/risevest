@@ -34,11 +34,11 @@ const emailTemplates = {
                       <td style=" padding: 30px;" align="justify">
                           <h2 style="font-size: 19px; margin:0 0 24px 0; font-family:Avenir, 'Circular Std', 'Secular One';">
                           Hi {{name}},
-                          Welcome to Use Divest Bookstore, your gateway to discovering new and exciting books.</h2>
+                          Welcome to Risevest Blog, your gateway to discovering new and exciting articles.</h2>
                           <p style="margin:0 0 0 0;font-size:14px;line-height:24px;font-family:Avenir, 'Circular Std',
                               'Secular One'; font-weight: 400;" align="justify">
                               Now that you have taken the first step, we are excited to see what else you do. Getting settled
-                              on Use Divest is pretty easy. <br><br>
+                              on Risevest is pretty easy. <br><br>
                           </p>
                       </td>
                   </tr>
@@ -66,8 +66,8 @@ const emailTemplates = {
                           <p style="margin:35px 0 0 0;font-size:14px;line-height:24px;font-family:Avenir, 'Circular Std',
                               'Secular One'; font-weight: 400; color: #A7B8BF">
                               If you did not take this action, please contact us immediately at <a
-                                  href="mailto:support@usedivest.ng"
-                                  style="text-decoration: none; font-weight: bold; color: #253342;  font-family:Avenir, 'Circular Std', 'Secular One';">support@usedivest.ng</a>
+                                  href="mailto:support@useRisevest.ng"
+                                  style="text-decoration: none; font-weight: bold; color: #253342;  font-family:Avenir, 'Circular Std', 'Secular One';">support@useRisevest.ng</a>
                           </p>
                       </td>
                   </tr>
@@ -82,7 +82,7 @@ const emailTemplates = {
                       <td bgcolor="transparent" style="padding: 0px 30px 10px 30px;">
                           <p style="margin:0 0 12px 0; font-size:14px; line-height:24px; color: #000; font-family:Avenir,
                               'Circular Std', 'Secular One'; text-align:center; color: #8d999d">
-                              ©2024 Use Divest. All Rights Reserved</p>
+                              ©2024 Use Risevest. All Rights Reserved</p>
                       </td>
                   </tr>
               </table>

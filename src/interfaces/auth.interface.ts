@@ -1,13 +1,3 @@
-export interface RegisterResponse {
-  tempUserId: string;
-  otp?: string;
-}
-
-export interface LoginInterface {
-  email: string;
-  password: string;
-}
-
 export interface RegisterInterface {
   email: string;
   name: string;

@@ -7,15 +7,6 @@ import { CreateCommentInterface } from "../interfaces/comment.interface";
 export default class PostController {
   private postService = new PostService();
 
-  async getPostById(postId: string) {
-    try {
-      return await this.postService.getPostById(postId);
-    } catch (error) {
-      logger.error(error);
-      throw error;
-    }
-  }
-
   async createComment(
     userId: string,
     postId: string,
