@@ -16,7 +16,7 @@ RUN npm run build
 EXPOSE 3000
 
 # Use an environment variable to determine the startup command
-CMD if [ "$NODE_ENV" = "production" ]; \
+CMD if [ "$NODE_ENV" = "prod" ]; \
     then node dist/server.js; \
     else npm run local; \
     fi
