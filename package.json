@@ -9,7 +9,7 @@
     "local": "nodemon -L --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
     "build": "rm -rf dist && npm run  build-ts",
     "staging": "npm run build && node dist/server.js",
-    "production": "npm run build && node dist/server.js",
+    "start": "npm run build && node dist/server.js",
     "migrate": "sequelize db:migrate",
     "seed": "sequelize db:seed:all",
     "build-ts": "tsc"
