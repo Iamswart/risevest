@@ -1,8 +1,8 @@
-# Risevest Online Blog
+# Risevest Blog
 
 ## Overview
 
-Risevest Online Blog is a web application for managing post, comments and users for an online bookstore.
+Risevest Online Blog is a web application for managing post, comments and users for a blog.
 
 ## Table of Contents
 
@@ -17,6 +17,7 @@ Risevest Online Blog is a web application for managing post, comments and users 
 
 - Node.js and npm installed
 - PostgreSQL database (using ElephantSQL)
+- Docker
 
 ### Installation
 
@@ -31,7 +32,7 @@ Risevest Online Blog is a web application for managing post, comments and users 
 2. Install the dependencies:
 
    ```bash
-   npm install
+   docker-compose build
 
 
    ```
@@ -71,65 +72,53 @@ Risevest Online Blog is a web application for managing post, comments and users 
 4. Start the Server
 
    ```bash
-    npm run local
+    docker-compose up
 
    ```
 
-5. API Documentation
-
-   You can view the API documentation by navigating to http://localhost:3000/api-docs.
 
 ## Usage
 
-### Authentication
+### Users
 
-- POST /auth/login - Login a user
-- POST /auth/register - Register a new user
+- POST /users/login - Login a user
+- POST /users - Register a new user
+- GET /users - Get all users
 
-### Books
+### Posts
 
-- GET /books - Search books
-- POST /books - Create a new book
-- GET /books/:id - View book details
+- GET /users/:id/posts - Retrieve a user posts
+- POST /users/:id/posts - Create post for a user
+- GET /posts/:postId/comments - Retrieve comment for a post
+- POST /posts/:postId/comments - Add comment to a post
+- GET /posts/top-users - Fetch the top 3 users with the most posts
 
-### Cart
-
-- GET /cart - View cart
-- POST /cart - Add a book to cart
-- PUT /cart - Update cart item quantity
-- DELETE /cart/:cartItemId - Remove item from cart
-
-### Orders
-
-- POST /orders - Create a new order
-- GET /orders - Get order history
-- GET /orders/:orderId - Get order by ID
 
 ## API Documentation
 
 ### Swagger Doc
 
-- You can view the API documentation by navigating to http://localhost:3000/api-docs after starting the server.
+- You can view the API documentation by navigating to https://risevest-5607.postman.co/workspace/Risevest~d60c3d2a-d42d-4753-9793-d493553856f3/request/29984590-90bd4e82-0fec-49cf-8e97-4d25c34f5f4a.
 
 ## Scripts
 
 ### Install Dependencies
 
     ```bash
-    npm install
+    docker-compose build
 
     ```
 
 ### Test
 
     ```bash
-    npm run test
+    docker-compose run --rm app npm run test
 
     ```
 
 ### Start
 
     ```bash
-    npm run local
+    docker-compose up
 
     ```
