@@ -1,12 +1,11 @@
-import PostService from '../src/services/post.service';
-import { CreatePostInterface } from '../src/interfaces/post.interface';
-import { CreateCommentInterface } from '../src/interfaces/comment.interface';
-import { PaginationOptions } from '../src/interfaces/pagination.interface';
-import { badRequestError, unknownResourceError } from '../src/error';
-import { Op } from 'sequelize';
+import PostService from "../src/services/post.service";
+import { CreatePostInterface } from "../src/interfaces/post.interface";
+import { CreateCommentInterface } from "../src/interfaces/comment.interface";
+import { PaginationOptions } from "../src/interfaces/pagination.interface";
+import { badRequestError, unknownResourceError } from "../src/error";
+import { Op, fn, col, literal } from "sequelize";
 
-// Mock the database models
-jest.mock('../src/database/models', () => ({
+jest.mock("../src/database/models", () => ({
   User: {
     findByPk: jest.fn(),
     findAll: jest.fn(),
@@ -24,84 +23,88 @@ jest.mock('../src/database/models', () => ({
 }));
 
 const mockUser = {
-  id: '123',
-  name: 'Test User',
-  email: 'test@example.com',
+  id: "123",
+  name: "Test User",
+  email: "test@example.com",
 };
 
 const mockPost = {
-  id: '456',
-  title: 'Test Post',
-  content: 'This is a test post',
-  userId: '123',
+  id: "456",
+  title: "Test Post",
+  content: "This is a test post",
+  userId: "123",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
 
 const mockComment = {
-  id: '789',
-  content: 'Test comment',
-  postId: '456',
-  userId: '123',
+  id: "789",
+  content: "Test comment",
+  postId: "456",
+  userId: "123",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
 
-describe('PostService', () => {
+describe("PostService", () => {
   let postService: PostService;
-  const db = require('../src/database/models');
+  const db = require("../src/database/models");
 
   beforeEach(() => {
     postService = new PostService();
     jest.clearAllMocks();
   });
 
-  describe('createPost', () => {
-    it('should create a new post', async () => {
+  describe("createPost", () => {
+    it("should create a new post", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.create.mockResolvedValue(mockPost);
 
       const input: CreatePostInterface = {
-        title: 'Test Post',
-        content: 'This is a test post',
+        title: "Test Post",
+        content: "This is a test post",
       };
 
-      const result = await postService.createPost('123', input);
+      const result = await postService.createPost("123", input);
 
-      expect(db.User.findByPk).toHaveBeenCalledWith('123');
+      expect(db.User.findByPk).toHaveBeenCalledWith("123");
       expect(db.Post.create).toHaveBeenCalledWith({
-        title: 'Test Post',
-        content: 'This is a test post',
-        userId: '123',
+        title: "Test Post",
+        content: "This is a test post",
+        userId: "123",
       });
       expect(result).toEqual(mockPost);
     });
 
-    it('should throw an error if user is not found', async () => {
+    it("should throw an error if user is not found", async () => {
       db.User.findByPk.mockResolvedValue(null);
 
       const input: CreatePostInterface = {
-        title: 'Test Post',
-        content: 'This is a test post',
+        title: "Test Post",
+        content: "This is a test post",
       };
 
-      await expect(postService.createPost('123', input)).rejects.toThrow(unknownResourceError('User not found'));
+      await expect(postService.createPost("123", input)).rejects.toThrow(
+        unknownResourceError("User not found")
+      );
     });
 
-    it('should throw an error if title or content is missing', async () => {
+    it("should throw an error if title or content is missing", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
 
       const input: CreatePostInterface = {
-        title: '',
-        content: '',
+        title: "",
+        content: "",
       };
 
-      await expect(postService.createPost('123', input)).rejects.toThrow(badRequestError('Title and content are required'));
+      await expect(postService.createPost("123", input)).rejects.toThrow(
+        badRequestError("Title and content are required")
+      );
     });
   });
 
-  describe('getUserPosts', () => {
-    it('should get user posts with pagination', async () => {
+  describe("getUserPosts", () => {
+    it("should get user posts with pagination", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findAndCountAll.mockResolvedValue({
         rows: [mockPost],
@@ -113,15 +116,15 @@ describe('PostService', () => {
         limit: 10,
       };
 
-      const result = await postService.getUserPosts('123', options);
+      const result = await postService.getUserPosts("123", options);
 
-      expect(db.User.findByPk).toHaveBeenCalledWith('123');
+      expect(db.User.findByPk).toHaveBeenCalledWith("123");
       expect(db.Post.findAndCountAll).toHaveBeenCalledWith({
-        where: { userId: '123' },
+        where: { userId: "123" },
         limit: 10,
         offset: 0,
-        order: [['createdAt', 'DESC']],
-        attributes: ['id', 'title', 'content', 'createdAt', 'updatedAt'],
+        order: [["createdAt", "DESC"]],
+        attributes: ["id", "title", "content", "createdAt", "updatedAt"],
       });
       expect(result).toEqual({
         posts: [mockPost],
@@ -131,7 +134,7 @@ describe('PostService', () => {
       });
     });
 
-    it('should return empty result if user has no posts', async () => {
+    it("should return empty result if user has no posts", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findAndCountAll.mockResolvedValue({
         rows: [],
@@ -143,18 +146,18 @@ describe('PostService', () => {
         limit: 10,
       };
 
-      const result = await postService.getUserPosts('123', options);
+      const result = await postService.getUserPosts("123", options);
 
       expect(result).toEqual({
         posts: [],
         totalPages: 0,
         currentPage: 1,
         totalPosts: 0,
-        message: 'User has no posts',
+        message: "User has no posts",
       });
     });
 
-    it('should apply search filter if provided', async () => {
+    it("should apply search filter if provided", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findAndCountAll.mockResolvedValue({
         rows: [mockPost],
@@ -164,43 +167,50 @@ describe('PostService', () => {
       const options: PaginationOptions = {
         page: 1,
         limit: 10,
-        search: 'test',
+        search: "test",
       };
 
-      await postService.getUserPosts('123', options);
+      await postService.getUserPosts("123", options);
 
       expect(db.Post.findAndCountAll).toHaveBeenCalledWith({
         where: {
-          userId: '123',
+          userId: "123",
           [Op.or]: [
-            { title: { [Op.iLike]: '%test%' } },
-            { content: { [Op.iLike]: '%test%' } },
+            { title: { [Op.iLike]: "%test%" } },
+            { content: { [Op.iLike]: "%test%" } },
           ],
         },
         limit: 10,
         offset: 0,
-        order: [['createdAt', 'DESC']],
-        attributes: ['id', 'title', 'content', 'createdAt', 'updatedAt'],
+        order: [["createdAt", "DESC"]],
+        attributes: ["id", "title", "content", "createdAt", "updatedAt"],
       });
     });
   });
 
-  describe('getPostById', () => {
-    it('should get a post by id', async () => {
+  describe("getPostById", () => {
+    it("should get a post by id", async () => {
       db.Post.findByPk.mockResolvedValue({
         ...mockPost,
         author: mockUser,
       });
 
-      const result = await postService.getPostById('456');
+      const result = await postService.getPostById("456");
 
-      expect(db.Post.findByPk).toHaveBeenCalledWith('456', {
-        attributes: ['id', 'title', 'content', 'userId', 'createdAt', 'updatedAt'],
+      expect(db.Post.findByPk).toHaveBeenCalledWith("456", {
+        attributes: [
+          "id",
+          "title",
+          "content",
+          "userId",
+          "createdAt",
+          "updatedAt",
+        ],
         include: [
           {
             model: db.User,
-            as: 'author',
-            attributes: ['id', 'name', 'email'],
+            as: "author",
+            attributes: ["id", "name", "email"],
           },
         ],
       });
@@ -210,71 +220,79 @@ describe('PostService', () => {
       });
     });
 
-    it('should throw an error if post is not found', async () => {
+    it("should throw an error if post is not found", async () => {
       db.Post.findByPk.mockResolvedValue(null);
 
-      await expect(postService.getPostById('456')).rejects.toThrow(unknownResourceError('Post not found'));
+      await expect(postService.getPostById("456")).rejects.toThrow(
+        unknownResourceError("Post not found")
+      );
     });
   });
 
-  describe('createComment', () => {
-    it('should create a new comment', async () => {
+  describe("createComment", () => {
+    it("should create a new comment", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findByPk.mockResolvedValue(mockPost);
       db.Comment.create.mockResolvedValue(mockComment);
 
       const input: CreateCommentInterface = {
-        content: 'Test comment',
+        content: "Test comment",
       };
 
-      const result = await postService.createComment('123', '456', input);
+      const result = await postService.createComment("123", "456", input);
 
-      expect(db.User.findByPk).toHaveBeenCalledWith('123');
-      expect(db.Post.findByPk).toHaveBeenCalledWith('456');
+      expect(db.User.findByPk).toHaveBeenCalledWith("123");
+      expect(db.Post.findByPk).toHaveBeenCalledWith("456");
       expect(db.Comment.create).toHaveBeenCalledWith({
-        content: 'Test comment',
-        postId: '456',
-        userId: '123',
+        content: "Test comment",
+        postId: "456",
+        userId: "123",
         parentId: undefined,
       });
       expect(result).toEqual(mockComment);
     });
 
-    it('should throw an error if user is not found', async () => {
+    it("should throw an error if user is not found", async () => {
       db.User.findByPk.mockResolvedValue(null);
 
       const input: CreateCommentInterface = {
-        content: 'Test comment',
+        content: "Test comment",
       };
 
-      await expect(postService.createComment('123', '456', input)).rejects.toThrow(unknownResourceError('User not found'));
+      await expect(
+        postService.createComment("123", "456", input)
+      ).rejects.toThrow(unknownResourceError("User not found"));
     });
 
-    it('should throw an error if post is not found', async () => {
+    it("should throw an error if post is not found", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findByPk.mockResolvedValue(null);
 
       const input: CreateCommentInterface = {
-        content: 'Test comment',
+        content: "Test comment",
       };
 
-      await expect(postService.createComment('123', '456', input)).rejects.toThrow(unknownResourceError('Post not found'));
+      await expect(
+        postService.createComment("123", "456", input)
+      ).rejects.toThrow(unknownResourceError("Post not found"));
     });
 
-    it('should throw an error if content is missing', async () => {
+    it("should throw an error if content is missing", async () => {
       db.User.findByPk.mockResolvedValue(mockUser);
       db.Post.findByPk.mockResolvedValue(mockPost);
 
       const input: CreateCommentInterface = {
-        content: '',
+        content: "",
       };
 
-      await expect(postService.createComment('123', '456', input)).rejects.toThrow(badRequestError('Comment content is required'));
+      await expect(
+        postService.createComment("123", "456", input)
+      ).rejects.toThrow(badRequestError("Comment content is required"));
     });
   });
 
-  describe('getPostComments', () => {
-    it('should get post comments with pagination', async () => {
+  describe("getPostComments", () => {
+    it("should get post comments with pagination", async () => {
       db.Post.findByPk.mockResolvedValue(mockPost);
       db.Comment.findAndCountAll.mockResolvedValue({
         rows: [{ ...mockComment, user: mockUser }],
@@ -286,20 +304,27 @@ describe('PostService', () => {
         limit: 10,
       };
 
-      const result = await postService.getPostComments('456', options);
+      const result = await postService.getPostComments("456", options);
 
-      expect(db.Post.findByPk).toHaveBeenCalledWith('456');
+      expect(db.Post.findByPk).toHaveBeenCalledWith("456");
       expect(db.Comment.findAndCountAll).toHaveBeenCalledWith({
-        where: { postId: '456' },
+        where: { postId: "456" },
         limit: 10,
         offset: 0,
-        order: [['createdAt', 'DESC']],
-        attributes: ['id', 'content', 'userId', 'parentId', 'createdAt', 'updatedAt'],
+        order: [["createdAt", "DESC"]],
+        attributes: [
+          "id",
+          "content",
+          "userId",
+          "parentId",
+          "createdAt",
+          "updatedAt",
+        ],
         include: [
           {
             model: db.User,
-            as: 'user',
-            attributes: ['id', 'name'],
+            as: "user",
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -311,7 +336,7 @@ describe('PostService', () => {
       });
     });
 
-    it('should return empty result if post has no comments', async () => {
+    it("should return empty result if post has no comments", async () => {
       db.Post.findByPk.mockResolvedValue(mockPost);
       db.Comment.findAndCountAll.mockResolvedValue({
         rows: [],
@@ -323,18 +348,18 @@ describe('PostService', () => {
         limit: 10,
       };
 
-      const result = await postService.getPostComments('456', options);
+      const result = await postService.getPostComments("456", options);
 
       expect(result).toEqual({
         comments: [],
         totalPages: 0,
         currentPage: 1,
         totalComments: 0,
-        message: 'Post has no comments',
+        message: "Post has no comments",
       });
     });
 
-    it('should throw an error if post is not found', async () => {
+    it("should throw an error if post is not found", async () => {
       db.Post.findByPk.mockResolvedValue(null);
 
       const options: PaginationOptions = {
@@ -342,7 +367,9 @@ describe('PostService', () => {
         limit: 10,
       };
 
-      await expect(postService.getPostComments('456', options)).rejects.toThrow(unknownResourceError('Post not found'));
+      await expect(postService.getPostComments("456", options)).rejects.toThrow(
+        unknownResourceError("Post not found")
+      );
     });
   });
 
@@ -353,30 +380,42 @@ describe('PostService', () => {
           id: '123',
           name: 'Test User',
           email: 'test@example.com',
-          get: jest.fn().mockReturnValue('10'),
-          latestComment: 'Latest comment:::2023-05-01T12:00:00Z',
+          get: jest.fn().mockImplementation((key) => {
+            if (key === 'postCount') return '10';
+            if (key === 'latestComment') return 'Latest comment:::2023-05-01T12:00:00Z';
+            return null;
+          }),
         },
       ];
-
+  
       db.User.findAll.mockResolvedValue(mockTopUsers);
-
+  
       const result = await postService.getTopUsersWithLatestComment();
-
+  
       expect(db.User.findAll).toHaveBeenCalledWith({
-        attributes: expect.arrayContaining([
+        attributes: [
           'id',
           'name',
           'email',
-          [expect.any(Function), 'postCount'],
-          [expect.any(Object), 'latestComment'],
-        ]),
-        include: [expect.any(Object)],
+          [fn('COUNT', col('posts.id')), 'postCount'],
+          [expect.objectContaining({
+            val: expect.stringMatching(/SELECT\s+CONCAT_WS\(':::',\s*content,\s*created_at\)\s*FROM\s+comments\s*WHERE\s+comments\.user_id\s*=\s*"User"\.id\s*ORDER\s*BY\s*comments\.created_at\s*DESC\s*LIMIT\s*1/)
+          }), 'latestComment'],
+        ],
+        include: [
+          {
+            model: db.Post,
+            as: 'posts',
+            attributes: [],
+            required: false,
+          },
+        ],
         group: ['"User".id'],
-        order: [[expect.any(Function), 'DESC']],
+        order: [[fn('COUNT', col('posts.id')), 'DESC']],
         limit: 3,
         subQuery: false,
       });
-
+  
       expect(result).toEqual([
         {
           id: '123',
@@ -388,22 +427,25 @@ describe('PostService', () => {
         },
       ]);
     });
-
+  
     it('should handle users without comments', async () => {
       const mockTopUsers = [
         {
           id: '123',
           name: 'Test User',
           email: 'test@example.com',
-          get: jest.fn().mockReturnValue('5'),
-          latestComment: null,
+          get: jest.fn().mockImplementation((key) => {
+            if (key === 'postCount') return '5';
+            if (key === 'latestComment') return ':::';
+            return null;
+          }),
         },
       ];
-
+  
       db.User.findAll.mockResolvedValue(mockTopUsers);
-
+  
       const result = await postService.getTopUsersWithLatestComment();
-
+  
       expect(result).toEqual([
         {
           id: '123',
